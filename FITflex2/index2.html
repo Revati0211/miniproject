@@ -52,8 +52,10 @@
     .inputs {
         width: 100%;
         display: flex;
+        flex-direction: row;
         justify-content: space-between;
         align-items: center;
+        justify-items: center;
         gap: 20px;
         height: fit-content;
     }
@@ -192,6 +194,14 @@
                 <label for="bloodsugerlevel">Blood Sugar Level (in mg/dL)</label>
                 <input id="bloodsugerlevel" type="number">
             </div>
+            <div style="margin-top: 16px;">
+                <label for="weight">Weight ( In KG )</label>
+                <input id="weight" type="number">
+            </div>
+            <div style="margin-top: 16px;">
+                <label for="calorie">Calorie intake</label>
+                <input id="calorie" type="number">
+            </div>
         </div>
 
         <button id="submit">Submit</button>
@@ -207,6 +217,8 @@
                     <th>Water Intake <br> (in ml)</th>
                     <th>Exercise Duration <br> (in min)</th>
                     <th>Blood Sugar Level <br> (in mg/dL)</th>
+                    <th>Weight<br> (In KG) </th>
+                    <th>Calorie Intake <br> (in Kcal)</th>
                     <th>Edit</th>
                     <th>Delete</th>
                 </tr>
@@ -258,6 +270,8 @@
             const waterInput = document.getElementById('water').value;
             const exerciseInput = document.getElementById('exercise').value;
             const bloodSugarInput = document.getElementById('bloodsugerlevel').value;
+            const weightInput = document.getElementById('weight').value;
+            const calorieInput = document.getElementById('calorie').value;
             const token = localStorage.getItem("token");
             var isSuccesful = false;
 
@@ -268,7 +282,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ token, water_intake: waterInput, exercise_duration: exerciseInput, blood_sugar_level: bloodSugarInput })
+                    body: JSON.stringify({ token, water_intake: waterInput, exercise_duration: exerciseInput, blood_sugar_level: bloodSugarInput, calories_intake: calorieInput, weight: weightInput })
                 })
 
                 const result = await response.json();
@@ -293,14 +307,17 @@
                 row.cells[1].innerText = waterInput;
                 row.cells[2].innerText = exerciseInput;
                 row.cells[3].innerText = bloodSugarInput;
+                row.cells[4].innerText = weightInput;
+                row.cells[5].innerText = calorieInput;
+
                 resetForm();
                 return;
             }
 
-            addRow(waterInput, exerciseInput, bloodSugarInput)
+            addRow(waterInput, exerciseInput, bloodSugarInput, weightInput, calorieInput)
         });
 
-        function addRow(waterInput, exerciseInput, bloodSugarInput) { 
+        function addRow(waterInput, exerciseInput, bloodSugarInput, weightInput, calorieInput) { 
              // Otherwise, add a new entry
             const output = document.getElementById('output');
 
@@ -309,10 +326,13 @@
             newRow.insertCell(1).innerText = waterInput;
             newRow.insertCell(2).innerText = exerciseInput;
             newRow.insertCell(3).innerText = bloodSugarInput;
+            newRow.insertCell(4).innerText = weightInput;
+            newRow.insertCell(5).innerText = calorieInput;
+            
 
             // Add Edit and Delete buttons
-            const editCell = newRow.insertCell(4);
-            const deleteCell = newRow.insertCell(5);
+            const editCell = newRow.insertCell(6);
+            const deleteCell = newRow.insertCell(7);
 
             const editButton = document.createElement('button');
             editButton.innerText = 'Edit';
@@ -342,6 +362,7 @@
 
         function deleteRow(row) {
             row.classList.add('delete-animation');
+            console.log(row.cells[0].innerText)
             setTimeout(() => {
                 output.deleteRow(Array.from(output.rows).indexOf(row));
             }, 400); // Wait for animation to finish
@@ -351,6 +372,8 @@
             document.getElementById('water').value = '';
             document.getElementById('exercise').value = '';
             document.getElementById('bloodsugerlevel').value = '';
+            document.getElementById('weight').value = '';
+            document.getElementById('calorie').value = '';
             editIndex = -1; // Reset edit index
             document.getElementById('editSection').classList.add('hidden'); // Hide edit section
         }
@@ -380,7 +403,7 @@
                     // water_intake_ml: 1, workout_minutes: 30, blood_sugar_level: '1
                     console.log('data fetch success')
                     result.fitnessData.forEach(element => {
-                        addRow(element.water_intake_ml,element.workout_minutes, element.blood_sugar_level );
+                        addRow(element.water_intake_ml,element.workout_minutes, element.blood_sugar_level, element.weight, element.calories_intake);
                         
                     });
 
